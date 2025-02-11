@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photography Gallery</title>
+
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; margin: 0; }
+        h1 { padding: 20px; background: #333; color: white; margin: 0; position: fixed; width: 100%; top: 0; z-index: 1000; }
+
+        /* Navigation Menu */
+        .menu { 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
+            padding: 10px; 
+            background: #444; 
+            position: fixed; 
+            top: 75px; 
+            width: 100%; 
+            z-index: 999; 
+        }
+        .menu button { 
+            padding: 10px 15px; 
+            border: none; 
+            cursor: pointer; 
+            background: white; 
+            border-radius: 5px; 
+            transition: transform 0.2s, background 0.3s; 
+        }
+        .menu button:hover { transform: scale(1.1); background: #ddd; }
+
+        /* Gallery Grid */
+        .gallery { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); /* 4 images per row */
+            gap: 10px; 
+            padding: 200px 40px 40px; /* Space for fixed header/menu */
+        }
+        .gallery img { 
+            width: 100%; 
+            height: 400px; /* Fixed height */
+            object-fit: cover; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            transition: transform 0.1s ease-in-out; 
+        }
+        .gallery img:hover { transform: scale(1.05); }
+        
+        /* Lightbox Effect */
+        .lightbox { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.8); 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .lightbox img { 
+            max-width: 90%; 
+            max-height: 90%; 
+        }
+
+        /* Pagination Controls */
+        .pagination { 
+            display: flex; 
+            justify-content: center; 
+            margin: 20px 0; 
+        }
+        .pagination button { 
+            padding: 10px; 
+            margin: 0 5px; 
+        }
+
+        @media (max-width: 800px) {
+            .gallery { grid-template-columns: repeat(2, 1fr); } /* 2 images per row on small screens */
+        }
+        @media (max-width: 500px) {
+            .gallery { grid-template-columns: repeat(1, 1fr); } /* 1 image per row on very small screens */
+        }
+
+    </style>
+</head>
+<body>
+    <h1>My Photography Gallery</h1>
+
+    <!-- Navigation Menu -->
+    <div class="menu">
+        <button onclick="showGallery('trip1')">Mallorca</button>
+        <button onclick="showGallery('trip2')">Trip 2</button>
+        <button onclick="showGallery('trip3')">Trip 3</button>
+    </div>
+
+    <!-- Photo Gallery -->
+    <div class="gallery" id="gallery"></div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        <button id="prev-button" onclick="changePage(-1)">Previous</button>
+        <span id="page-info">Page 1</span>
+        <button id="next-button" onclick="changePage(1)">Next</button>
+    </div>
+
+    <!-- Lightbox Effect -->
+    <div id="lightbox" class="lightbox" onclick="this.style.display='none'">
+        <img id="lightbox-img" src="">
+    </div>
+
+    <script defer>
+        const images = {
+            trip1: [
+                { small: "slike/1-09c858d2-small.webp", full: "slike/1-09c858d2.webp" },
+                { small: "slike/1-429e04af-small.webp", full: "slike/1-429e04af.webp" },
+                { small: "slike/1-723eff39-small.webp", full: "slike/1-723eff39.webp" },
+                { small: "slike/1-af68679a-small.webp", full: "slike/1-af68679a.webp" },
+                { small: "slike/1-c5d05887-small.webp", full: "slike/1-c5d05887.webp" },
+                { small: "slike/2-09c858d2-small.webp", full: "slike/2-09c858d2.webp" },
+                { small: "slike/2-429e04af-small.webp", full: "slike/2-429e04af.webp" },
+                { small: "slike/2-723eff39-small.webp", full: "slike/2-723eff39.webp" },
+                { small: "slike/2-af68679a-small.webp", full: "slike/2-af68679a.webp" },
+                { small: "slike/2-c5d05887-small.webp", full: "slike/2-c5d05887.webp" },
+                { small: "slike/3-09c858d2-small.webp", full: "slike/3-09c858d2.webp" },
+                { small: "slike/3-429e04af-small.webp", full: "slike/3-429e04af.webp" },
+                { small: "slike/3-723eff39-small.webp", full: "slike/3-723eff39.webp" },
+                { small: "slike/3-af68679a-small.webp", full: "slike/3-af68679a.webp" },
+                { small: "slike/3-c5d05887-small.webp", full: "slike/3-c5d05887.webp" },
+                { small: "slike/4-09c858d2-small.webp", full: "slike/4-09c858d2.webp" },
+                { small: "slike/4-429e04af-small.webp", full: "slike/4-429e04af.webp" },
+                { small: "slike/4-723eff39-small.webp", full: "slike/4-723eff39.webp" },
+                { small: "slike/4-af68679a-small.webp", full: "slike/4-af68679a.webp" },
+                { small: "slike/4-c5d05887-small.webp", full: "slike/4-c5d05887.webp" },
+                { small: "slike/FullSizeRender-small.webp", full: "slike/FullSizeRender.webp" },
+                { small: "slike/IMG_0296-small.webp", full: "slike/IMG_0296.webp" },
+                { small: "slike/IMG_0349-small.webp", full: "slike/IMG_0349.webp" },
+                { small: "slike/IMG_0373-small.webp", full: "slike/IMG_0373.webp" },
+                { small: "slike/IMG_0405-small.webp", full: "slike/IMG_0405.webp" },
+                { small: "slike/IMG_0417-small.webp", full: "slike/IMG_0417.webp" },
+                { small: "slike/IMG_0471-small.webp", full: "slike/IMG_0471.webp" },
+                { small: "slike/IMG_0476-small.webp", full: "slike/IMG_0476.webp" },
+                { small: "slike/IMG_0477-small.webp", full: "slike/IMG_0477.webp" },
+                { small: "slike/IMG_0569-small.webp", full: "slike/IMG_0569.webp" },
+                { small: "slike/IMG_0647-small.webp", full: "slike/IMG_0647.webp" },
+                { small: "slike/IMG_0659-small.webp", full: "slike/IMG_0659.webp" },
+                { small: "slike/IMG_0666-small.webp", full: "slike/IMG_0666.webp" },
+                { small: "slike/IMG_2487-small.webp", full: "slike/IMG_2487.webp" },
+                { small: "slike/IMG_2494-small.webp", full: "slike/IMG_2494.webp" },
+                { small: "slike/IMG_7021-small.webp", full: "slike/IMG_7021.webp" },
+                { small: "slike/IMG_7022-small.webp", full: "slike/IMG_7022.webp" },
+                { small: "slike/IMG_7151-small.webp", full: "slike/IMG_7151.webp" },
+                { small: "slike/IMG_7362-small.webp", full: "slike/IMG_7362.webp" },
+                { small: "slike/IMG_7368-small.webp", full: "slike/IMG_7368.webp" },
+                { small: "slike/IMG_7376-small.webp", full: "slike/IMG_7376.webp" },
+                { small: "slike/IMG_7381-small.webp", full: "slike/IMG_7381.webp" },
+                { small: "slike/IMG_7387-small.webp", full: "slike/IMG_7387.webp" },
+                { small: "slike/IMG_7395-small.webp", full: "slike/IMG_7395.webp" },
+                { small: "slike/IMG_7407-small.webp", full: "slike/IMG_7407.webp" },
+                { small: "slike/IMG_7409-small.webp", full: "slike/IMG_7409.webp" },
+                { small: "slike/IMG_7419-small.webp", full: "slike/IMG_7419.webp" },
+                { small: "slike/IMG_7424-small.webp", full: "slike/IMG_7424.webp" },
+                { small: "slike/IMG_7427-small.webp", full: "slike/IMG_7427.webp" },
+                { small: "slike/IMG_7436-small.webp", full: "slike/IMG_7436.webp" },
+                { small: "slike/IMG_7447-small.webp", full: "slike/IMG_7447.webp" },
+                { small: "slike/IMG_7453-small.webp", full: "slike/IMG_7453.webp" },
+                { small: "slike/IMG_7465-small.webp", full: "slike/IMG_7465.webp" },
+                { small: "slike/IMG_7475-small.webp", full: "slike/IMG_7475.webp" },
+                { small: "slike/IMG_7479-small.webp", full: "slike/IMG_7479.webp" },
+                { small: "slike/IMG_7495-small.webp", full: "slike/IMG_7495.webp" },
+                { small: "slike/IMG_7497-small.webp", full: "slike/IMG_7497.webp" },
+                { small: "slike/IMG_7499-small.webp", full: "slike/IMG_7499.webp" },
+                { small: "slike/IMG_7517-small.webp", full: "slike/IMG_7517.webp" },
+                { small: "slike/IMG_7518-small.webp", full: "slike/IMG_7518.webp" },
+                { small: "slike/IMG_7528-small.webp", full: "slike/IMG_7528.webp" },
+                { small: "slike/IMG_7535-small.webp", full: "slike/IMG_7535.webp" },
+                { small: "slike/IMG_7540-small.webp", full: "slike/IMG_7540.webp" },
+                { small: "slike/IMG_7547-small.webp", full: "slike/IMG_7547.webp" },
+                { small: "slike/IMG_7551-small.webp", full: "slike/IMG_7551.webp" },
+                { small: "slike/IMG_7562-small.webp", full: "slike/IMG_7562.webp" },
+                { small: "slike/IMG_7588-small.webp", full: "slike/IMG_7588.webp" }
+            ],
+            trip2: [
+                { small: "slike/trip2-1-small.webp", full: "slike/trip2-1.webp" },
+                { small: "slike/trip2-2-small.webp", full: "slike/trip2-2.webp" }
+            ],
+            trip3: [
+                { small: "slike/trip3-1-small.webp", full: "slike/trip3-1.webp" },
+                { small: "slike/trip3-2-small.webp", full: "slike/trip3-2.webp" }
+            ]
+        };
+
+        let currentPage = 1;
+        const itemsPerPage = 12;
+        let totalPages;
+        let currentGallery = "trip1"; // Default gallery
+
+        function showGallery(trip) {
+            currentGallery = trip;
+            totalPages = Math.ceil(images[trip].length / itemsPerPage);
+            loadImages();
+        }
+
+        function loadImages() {
+            const gallery = document.getElementById("gallery");
+            gallery.innerHTML = "";
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, images[currentGallery].length);
+            const imgSubset = images[currentGallery].slice(startIndex, endIndex);
+
+            imgSubset.forEach(imgObj => {
+                let imgElement = document.createElement("img");
+
+                imgElement.src = imgObj.small; // Load small image in gallery
+                imgElement.dataset.fullSrc = imgObj.full; // Store full image path
+                imgElement.onclick = () => openLightbox(imgElement.dataset.fullSrc);
+
+                gallery.appendChild(imgElement);
+            });
+
+            document.getElementById("page-info").innerText = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById("prev-button").disabled = currentPage === 1;
+            document.getElementById("next-button").disabled = currentPage === totalPages;
+        }
+
+        function changePage(direction) {
+            if ((direction === -1 && currentPage > 1) || (direction === 1 && currentPage < totalPages)) {
+                currentPage += direction;
+                loadImages();
+            }
+        }
+
+        function openLightbox(imgSrc) {
+            document.getElementById("lightbox-img").src = imgSrc;
+            document.getElementById("lightbox").style.display = "flex";
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            showGallery(currentGallery);
+        });
+    </script>
+
+</body>
+</html>

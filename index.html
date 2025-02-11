@@ -7,8 +7,7 @@
 
     <style>
         body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; margin: 0; }
-        h1 { padding: 20px; background: #333; color: white; margin: 0; position: fixed; width: 100%; top: 0; z-index: 1000; }
-
+        h1 { padding: 20px; background: #333; color: white; margin: 0; position: fixed; width: 100%; top: 0; z-index: 1000; text-align: center;}
         /* Navigation Menu */
         .menu { 
             display: flex; 
@@ -56,7 +55,8 @@
             width: 100%; height: 100%; 
             background: rgba(0,0,0,0.8); 
             justify-content: center; 
-            align-items: center; 
+            align-items: center;
+            z-index: 2000;
         }
         .lightbox img { 
             max-width: 90%; 
@@ -72,6 +72,19 @@
         .pagination button { 
             padding: 10px; 
             margin: 0 5px; 
+        }
+
+        .menu-button { 
+            padding: 10px 15px; 
+            border: none; 
+            cursor: pointer; 
+            background: white; 
+            border-radius: 5px; 
+            transition: transform 0.2s, background 0.3s; 
+        }
+        .menu-button:hover { 
+            transform: scale(1.1); 
+            background: #ddd; 
         }
 
         @media (max-width: 800px) {
@@ -98,9 +111,9 @@
 
     <!-- Pagination Controls -->
     <div class="pagination">
-        <button id="prev-button" onclick="changePage(-1)">Previous</button>
+        <button class="menu-button" id="prev-button" onclick="changePage(-1)">Previous</button>
         <span id="page-info">Page 1</span>
-        <button id="next-button" onclick="changePage(1)">Next</button>
+        <button class="menu-button" id="next-button" onclick="changePage(1)">Next</button>
     </div>
 
     <!-- Lightbox Effect -->
@@ -111,7 +124,7 @@
     <script defer>
         const images = {
             trip1: [
-                { small: "slike/1-09c858d2-small.webp", full: "slike/1-09c858d2.webp" },
+            { small: "slike/1-09c858d2-small.webp", full: "slike/1-09c858d2.webp" },
                 { small: "slike/1-429e04af-small.webp", full: "slike/1-429e04af.webp" },
                 { small: "slike/1-723eff39-small.webp", full: "slike/1-723eff39.webp" },
                 { small: "slike/1-af68679a-small.webp", full: "slike/1-af68679a.webp" },
@@ -196,8 +209,10 @@
 
         function showGallery(trip) {
             currentGallery = trip;
+            currentPage = 1; // Reset to the first page when changing gallery
             totalPages = Math.ceil(images[trip].length / itemsPerPage);
             loadImages();
+            window.scrollTo(0, 0); // Scroll to the top
         }
 
         function loadImages() {
@@ -227,6 +242,7 @@
             if ((direction === -1 && currentPage > 1) || (direction === 1 && currentPage < totalPages)) {
                 currentPage += direction;
                 loadImages();
+                window.scrollTo(0, 0); // Scroll to the top when changing pages
             }
         }
 
